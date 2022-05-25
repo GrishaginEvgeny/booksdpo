@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}LstuBooks: Авторизация{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-5">
+                <form method="post">
+                    {% if app.user %}
+                        <div class="mb-3">
+                            You are logged in as {{ app.user.username }}, <a href="{{ path('app_logout') }}">Logout</a>
+                        </div>
+                    {% endif %}
+
+                    <h1 class="h3 mb-3 font-weight-normal text-center">Авторизация</h1>
+                    <label for="inputEmail">Почта</label>
+                    <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
+                    <label for="inputPassword">Пароль</label>
+                    <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
+
+                    <input type="hidden" name="_csrf_token"
+                           value="{{ csrf_token('authenticate') }}"
+                    >
+                    <div class="btn-cont text-center mt-2">
+                        <button class="btn-lg btn btn-outline-primary mt-2" type="submit">
+                            Войти
+                        </button>
+                    </div>
+                    {% if error %}
+                        <div class="alert alert-danger mt-2">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,88 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}LstuBooks: сайт для книгоманов{% endblock %}
+
+{% block body %}
+    <style>
+        .my-link:hover {
+            font-weight: 500;
+        }
+
+        a.disabled {
+            pointer-events: none;
+        }
+    </style>
+    <div class="wrapper">
+        <div class="container">
+            <div class="px-4 py-5 my-5 text-center m-0">
+                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-book"
+                     viewBox="0 0 16 16">
+                    <path d="M1 2.828c.885-.37 2.154-.769 3.388-.893 1.33-.134 2.458.063 3.112.752v9.746c-.935-.53-2.12-.603-3.213-.493-1.18.12-2.37.461-3.287.811V2.828zm7.5-.141c.654-.689 1.782-.886 3.112-.752 1.234.124 2.503.523 3.388.893v9.923c-.918-.35-2.107-.692-3.287-.81-1.094-.111-2.278-.039-3.213.492V2.687zM8 1.783C7.015.936 5.587.81 4.287.94c-1.514.153-3.042.672-3.994 1.105A.5.5 0 0 0 0 2.5v11a.5.5 0 0 0 .707.455c.882-.4 2.303-.881 3.68-1.02 1.409-.142 2.59.087 3.223.877a.5.5 0 0 0 .78 0c.633-.79 1.814-1.019 3.222-.877 1.378.139 2.8.62 3.681 1.02A.5.5 0 0 0 16 13.5v-11a.5.5 0 0 0-.293-.455c-.952-.433-2.48-.952-3.994-1.105C10.413.809 8.985.936 8 1.783z"/>
+                </svg>
+                <h1 class="display-5 fw-bold">LstuBooks</h1>
+                <div class="col-lg-6 mx-auto">
+                    <p class="lead mb-4">Сайт для любителей книг.</p>
+                    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                        {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                            <a type="button" href="/books/crud/new" class="btn btn-outline-primary btn-lg px-4 gap-3">Добавить
+                                книгу</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                {% for book in books %}
+                    <div class="col">
+                        <div class="card shadow-sm">
+                            {% if book.getPoster() is null %}
+                                <svg class="bd-placeholder-img card-img-top" width="100%" height="225"
+                                     xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail"
+                                     preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title>
+                                    <rect width="100%" height="100%" fill="#55595c"></rect>
+                                    <text x="42.5%" y="50%" fill="#eceeef" dy=".3em">Нет постера</text>
+                                </svg>
+                            {% else %}
+                                <img
+                                        src="{{ asset('uploads/posters/'~book.getPoster()) }}" height="225"
+                                        width="100%"/>
+                            {% endif %}
+                            <div class="card-body">
+                                <h4>{{ book.getTitle() }}</h4>
+                                <p class="text-muted mb-0">Жанр: {{ book.getGenre() }}</p>
+                                <p class="text-muted mb-0">Автор: {{ book.getAuthor() }}</p>
+                                <p class="text-muted">Загрузил: <a class="my-link"
+                                                                   style="color:#6c757d!important; text-decoration: none;"
+                                                                   href="/users/{{ book.getAdder().getId() }}">{{ book.getAdder().getName() }}</a>
+                                </p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="btn-group">
+                                        <a type="button" href="/books/{{ book.getId() }}"
+                                           class="btn btn-sm btn-outline-secondary">Прочитать</a>
+                                    </div>
+                                    <small class="text-muted">{{ book.getReadDate()|date("h:m:s d/m/y") }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="container text-center mt-3">
+            <a type="button" href="/?page={{ actual_page - 1 }}"
+               class="btn btn-outline-primary me-2 {% if actual_page == 1 %} disabled {% endif %}">Назад</a>
+            <a type="button" href="/?page=1"
+               class="btn btn-outline-primary mx-2 {% if actual_page == 1 %} disabled {% endif %}">1</a>
+            {% if actual_page != 1 and actual_page != last_page %}<a type="button"
+                                                                     class="btn btn-outline-primary disabled mx-5">{{ actual_page }}</a>
+            {% endif %}
+            <a type="button" href="/?page={{ last_page }}"
+               class="btn btn-outline-primary mx-2 {% if actual_page == last_page %} disabled {% endif %} ">{{ last_page }}</a>
+            <a type="button" href="/?page={{ actual_page + 1 }}"
+               class="btn btn-outline-primary ms-2 {% if actual_page == last_page %} disabled {% endif %}">Далее</a>
+        </div>
+    </div>
+{% endblock %}

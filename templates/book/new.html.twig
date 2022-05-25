@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}LstuBooks: {{ header }}{% endblock %}
+{% block body %}
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-5">
+                <div class="text-center">
+                    <h1>
+                        {{ header }}
+                    </h1>
+                </div>
+                {{ form_start(bookForm) }}
+                {{ form_widget(bookForm) }}
+                <div class="button_container text-center">
+                    <button type="submit" class="btn btn-outline-primary mt-3 mx-auto">Отправить</button>
+                </div>
+                {{ form_end(bookForm) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

@@ -1,0 +1,17 @@
+<div class="container">
+    <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
+        <a href="/" class="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none">
+            <h2 class="fw-bold mb-0">LstuBooks</h2>
+        </a>
+
+        <div class="col-md-3 text-end">
+            {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                <a href="/users/{{ app.user.getId() }}" type="button" class="btn btn-outline-primary me-2">Профиль</a>
+                <a href="/logout" type="button" class="btn btn-outline-primary me-2">Выйти</a>
+            {% else %}
+                <a href="/login" type="button" class="btn btn-outline-primary me-2">Войти</a>
+                <a href="/registration" type="button" class="btn btn-outline-primary">Зарегистрироваться</a>
+            {% endif %}
+        </div>
+    </header>
+</div>

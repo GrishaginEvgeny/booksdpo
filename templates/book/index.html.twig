@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}LstuBooks: {{ book.getTitle() }}{% endblock %}
+
+{% block body %}
+    <style>
+        .my-link:hover{
+            font-weight: 500;
+        }
+        a.disabled {
+            pointer-events: none;
+        }
+    </style>
+    <div class="container">
+        <div class="row">
+        <div class="pic-block col-4">
+            {% if book.getPoster() is null %}
+            <svg class="bd-placeholder-img card-img-top" width="100%" height="500" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"></rect><text x="40%" y="50%" fill="#eceeef" dy=".3em">Нет постера</text></svg>
+            {% else %}
+                <img src="{{ asset('uploads/posters/'~book.getPoster()) }}"
+                     height="500" width="100%"  />
+            {% endif %}
+        </div>
+        <div class="book-content col-8">
+            <div class="header">
+                <h1 class="title">{{ book.getTitle() }}</h1>
+                <p class="text-muted">Жанр: {{ book.getGenre() }}</p>
+                <p class="text-muted">Автор : {{ book.getAuthor() }}</p>
+                <p class="text-muted">Загрузил: <a class="my-link" style="color:#6c757d!important; text-decoration: none;" href="/users/{{ book.getAdder().getId() }}">{{ book.getAdder().getName() }}</a></p>
+                <p class="text-muted">Дата загрузки: {{ book.getReadDate()|date("h:m:s d/m/y") }}</p>
+            </div>
+        </div>
+    </div>
+        <div class="hint-block text-center mt-5">
+            {% if not is_granted('IS_AUTHENTICATED_FULLY') %}
+                <h1>Вы посещаете эту страницу как неавторизированный пользователь</h1>
+                <div class="button-block">
+                    <a type="button" href="/registration" class="btn btn-outline-primary btn-lg px-4 gap-3 me-2">Зарегистрироваться</a>
+                    <a type="button" href="/login"  class="btn btn-outline-primary btn-lg px-4">Войти</a>
+                </div>
+            {% elseif book.getAdder() is same as(app.getUser()) %}
+                <a type="button" class="btn btn-outline-primary btn-lg px-4 gap-3 me-2" href="{{ asset('uploads/books/')~book.getBook() }}">Прочитать книгу</a>
+                <a type="button" class="btn btn-outline-primary btn-lg px-4 gap-3 me-2" href="/books/crud/remove/{{ book.getId() }}">Удалить книгу</a>
+                <a type="button" class="btn btn-outline-primary btn-lg px-4 gap-3 me-2" href="/books/crud/update/{{ book.getId() }}">Изменить книгу</a>
+            {% else %}
+                <a type="button" class="btn btn-outline-primary btn-lg px-4 gap-3 me-2" href="{{ asset('uploads/books/')~book.getBook() }}">Прочитать книгу</a>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
