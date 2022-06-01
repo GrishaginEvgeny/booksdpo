@@ -28,19 +28,23 @@ class UserAuthenticator extends AbstractLoginFormAuthenticator
 
     private UrlGeneratorInterface $urlGenerator;
 
+    //объект с сервисами
     public function __construct(UrlGeneratorInterface $urlGenerator,private UserRepository $userRepository, private UserPasswordHasherInterface $hasher)
     {
         $this->urlGenerator = $urlGenerator;
     }
 
+    //функция аутификации
     public function authenticate(Request $request): Passport
     {
+        //получаем поля из формы
         $email = $request->request->get('email', '');
         $csrfToken = $request->request->get('_csrf_token');
         $password = $request->request->get('password', '');
 
         $request->getSession()->set(Security::LAST_USERNAME, $email);
 
+        //проверка на валидность
         return new Passport(
             new UserBadge($email,  function ($userIdentifier) use ($password, $email) {
                 $user = $this->userRepository->findOneBy(['email' => $userIdentifier]);
@@ -58,6 +62,7 @@ class UserAuthenticator extends AbstractLoginFormAuthenticator
         );
     }
 
+    //если авторизация успешная, то ридеерект на главную
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
         if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {

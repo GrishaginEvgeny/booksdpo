@@ -10,6 +10,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ProfileController extends AbstractController
 {
+    //запрос к странице определенного юзера
     #[Route('/users/{id}', name: 'app_profile')]
     public function index(UserRepository $userRepository, BookRepository $bookRepository, int $id): Response
     {

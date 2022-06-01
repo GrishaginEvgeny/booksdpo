@@ -19,6 +19,7 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 
 class BookController extends AbstractController
 {
+    //запрос на показ определённой книги
     #[Route('/books/{id}', name: 'app_book')]
     public function index(int $id, BookRepository $bookRepository): Response
     {
@@ -29,20 +30,25 @@ class BookController extends AbstractController
         ]);
     }
 
+    //запрос на создание новой книги
     #[Route('/books/crud/new', name: 'app_new_book')]
     public function new(Request $request, EntityManagerInterface $entityManager, BookRepository $bookRepository,SluggerInterface $slugger)
     {
+        //проверка на авторизировнного пользователя, если его нет то пользователя ридеректит на главную
         if(!$this->getUser()) return $this->redirect('/');
         $book = new Book();
+        //отрисовка формы
         $form = $this->createForm(AddBookFormType::class, $book, ['allow_extra_fields' => true]);
         $form->handleRequest($request);
+        //действия, когда отправляется валидная форма
         if ($form->isSubmitted() && $form->isValid()) {
+            //правильной заполнение незаполненных в форме полей
             $time = new \DateTime('now');
             $book->setReadDate($time);
             $book->setAdder($this->getUser());
             $bookFile = $form->get('bookFile')->getData();
             $posterFile = $form->get('posterFile')->getData();
-
+            //добавление файлов в бд и public
             if ($bookFile) {
                 $originalFilename = pathinfo($bookFile->getClientOriginalName(), PATHINFO_FILENAME);
                 $safeFilename = $slugger->slug($originalFilename);
@@ -71,7 +77,7 @@ class BookController extends AbstractController
                 $book->setPoster($newFilename);
             }
 
-
+            //отправка в бд
             $entityManager->persist($book);
             $entityManager->flush();
 
@@ -84,7 +90,7 @@ class BookController extends AbstractController
                 'poster' => $book->getPoster(),
                 'book' => $book->getBook(),
             ]);
-
+            //редирект на страницу созданной книги
             return $this->redirect('/books/'.$addedBook->getId());
         }
         return $this->render('book/new.html.twig', [
@@ -93,29 +99,39 @@ class BookController extends AbstractController
         ]);
     }
 
+    //запрос на удаление определённой книги
     #[Route('/books/crud/remove/{id}', name: 'app_remove_book')]
     public function remove(int $id, BookRepository $bookRepository)
     {
         $book = $bookRepository->findOneBy(['id'=> $id]);
+        //если создатель книги и пользователь не совпадают, то происходит ридерект на главную без удаления
         if($this->getUser() !== $book->getAdder()) return $this->redirect('/');
         $bookRepository->remove($book);
         return $this->redirect('/');
     }
 
+    //запрос на обновление определённой книги
     #[Route('/books/crud/update/{id}', name: 'app_update_book')]
     public function update(int $id, Request $request, EntityManagerInterface $entityManager, BookRepository $bookRepository,SluggerInterface $slugger)
     {
         $book = $bookRepository->findOneBy(['id'=> $id]);
+        //если книги с таким Id нет, то редирект на галвную
         if(!$book) return $this->redirect('/');
+        //если создатель книги и пользователь не совпадают, то происходит ридерект на главную без обновлденгия
         if($this->getUser() !== $book->getAdder()) return $this->redirect('/');
+        //отрисовка формы, которая создаётся из формы создания, но с другими полями для файлов
         $form = $this->createForm(AddBookFormType::class, $book,['allow_extra_fields' => true]);
         $form->handleRequest($request);
+        //проверка на валидность формы и действия если форма валидна
         if ($form->isSubmitted() && $form->isValid()) {
+            //обновление полей
             $time = new \DateTime('now');
             $book->setReadDate($time);
             $bookFile = $form->get('editedBookFile')->getData();
             $posterFile = $form->get('editedPosterFile')->getData();
 
+
+            //обновление файлов
             if ($bookFile) {
                 $originalFilename = pathinfo($bookFile->getClientOriginalName(), PATHINFO_FILENAME);
                 $safeFilename = $slugger->slug($originalFilename);
@@ -144,8 +160,11 @@ class BookController extends AbstractController
                 $book->setPoster($newFilename);
             }
 
+            //обновление
             $bookRepository->add($book);
 
+
+            //ридерект на страницу книги
             return $this->redirect('/books/'.$book->getId());
         }
         return $this->render('book/new.html.twig', [

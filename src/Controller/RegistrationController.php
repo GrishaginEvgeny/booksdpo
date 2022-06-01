@@ -14,15 +14,19 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class RegistrationController extends AbstractController
 {
+    //запрос на регистрацию
     #[Route('/registration', name: 'app_register')]
     public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager): Response
     {
+        //если зашёл авторизированный юзер ридеерект на главную
         if($this->getUser()) return $this->redirect('/');
         $user = new User();
+        //отрисовка формы
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
-
+        //проверка на валдиность
         if ($form->isSubmitted() && $form->isValid()) {
+            //обновление полей
             $user->setPassword(
             $userPasswordHasher->hashPassword(
                     $user,
@@ -30,7 +34,7 @@ class RegistrationController extends AbstractController
                 )
             );
             $user->setRoles(["ROLE_USER"]);
-
+            //добавление в бд
             $entityManager->persist($user);
             $entityManager->flush();
 

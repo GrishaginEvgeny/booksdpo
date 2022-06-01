@@ -16,6 +16,7 @@ use Symfony\Component\Validator\Constraints\NotNull;
 
 class AddBookFormType extends AbstractType
 {
+    //отрисовка формы добавления книги
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -56,6 +57,8 @@ class AddBookFormType extends AbstractType
                 ])
         ;
 
+        //если идёт запрос на отрисовку формы, но в параметр заполненеия попадает уже существующая книга, то
+        //отрисовывается форма измнеения книги
         $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event)
         {
             $post = $event->getData();

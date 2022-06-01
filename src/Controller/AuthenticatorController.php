@@ -9,14 +9,16 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class AuthenticatorController extends AbstractController
 {
+    //функция обработки запроса к юрлу /login
     #[Route(path: '/login', name: 'app_login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
+        //проверка на то, что обращение идёт от авторизированного пользователя
         if ($this->getUser()) {
              return $this->redirectToRoute('app_mainpage');
         }
 
-        // get the login error if there is one
+        // проверка на ошибки
         $error = $authenticationUtils->getLastAuthenticationError();
         // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
@@ -24,6 +26,7 @@ class AuthenticatorController extends AbstractController
         return $this->render('security/login.html.twig', ['last_username' => $lastUsername, 'error' => $error]);
     }
 
+    //юрл выхода
     #[Route(path: '/logout', name: 'app_logout')]
     public function logout(): void
     {

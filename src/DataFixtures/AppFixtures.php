@@ -10,11 +10,13 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
 {
+    //создаём объект сидов с нужными нам сервисами, тут это хэшэр паролей
     public function __construct(UserPasswordHasherInterface $hasher)
     {
         $this->hasher = $hasher;
     }
 
+    //сиды
     public function load(ObjectManager $manager): void
     {
         // $product = new Product();
